@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <% include partials/header %>
+  <body>
+
+    <% include partials/navbar %>
+    
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+
+        <div class="page-header">
+          <h1>
+            About <small>What we aim for!</small>
+          </h1>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading">About Us</div>
+          <div class="panel-body">
+            <p>My tutorial on how to use bootstrap to create a responsive
+            website.</p>
+          </div>
+        </div>
+      
+        <hr>
+        
+        <% include partials/footer %>
+      </div>
+      <!-- /container -->
+    </div>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('#about').addClass("active");
+      });
+    </script>
+
+    <% include partials/js_include %>
+
+  </body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <% include partials/header %>
+
+  <body>
+    <% include partials/navbar %>
+    
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+
+        <!-- Anchor the map to this div -->
+        <div id="map"></div>
+
+      </div>
+    </div>
+    
+    <div class="container">
+      <% include partials/content %>
+      <hr>
+      
+      <% include partials/footer %>
+    </div>
+    <!-- /container -->
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        // Bootstrap activation:
+        $('#home').addClass("active");      
+
+        var mapController = MapController();
+        mapController.initMapWithSFDefaults();
+      });
+    </script>
+
+    <% include partials/js_include %>
+
+    <!-- Leaflet Maps -->
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <!-- Map Controller (our code for map handling) -->
+    <script src="/javascripts/map_controller.js"></script>
+
+  </body>
+</html>
