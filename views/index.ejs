@@ -24,22 +24,25 @@
     <!-- /container -->
 
     <script type="text/javascript">
+      
       $(document).ready(function() {
         // Bootstrap activation:
         $("#home").addClass("active");
+
+        // Google Maps activation:
+        loadGoogleMaps();
       });
 
+      function loadGoogleMaps() {
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = "https://maps.googleapis.com/maps/api/js?v=3.exp" +
+          "&signed_in=true&callback=initialize&&key=AIzaSyDATd6iwCHxJUErroouJEelUB5VJ1LYjdE";
+        document.body.appendChild(script);
+      }
+      
       function initialize() {
-
-        var mapController = MapController();
-        var latLong = mapController.getSFLatitudeLongitude();
-        var mapOptions = {
-          zoom: mapController.getDefaultZoom(),
-          center: new google.maps.LatLng(latLong[0], latLong[1])
-        };
-        var map = new google.maps.Map($("#map")[0], mapOptions);
-
-        mapController.initMap(map);
+        MapController().init();
       }
     </script>
 
@@ -47,8 +50,6 @@
 
     <!-- Map Controller (our code for map handling) -->
     <script src="/javascripts/map_controller.js"></script>
-    <!-- Google Maps API (asynchronous initialization) -->
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&callback=initialize&key=AIzaSyDATd6iwCHxJUErroouJEelUB5VJ1LYjdE"></script>
 
   </body>
 </html>

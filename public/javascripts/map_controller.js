@@ -21,16 +21,12 @@
      */ 
     var _map = null;
 
-    function getSFLatitudeLongitude() {
-        return _sfLatitudeLongitude;
-    }
-
-    function getDefaultZoom() {
-        return _defaultZoom;
-    }
-
-    function initMap(map) {
-        _map = map;
+    function init() {
+        var mapOptions = {
+          zoom: _defaultZoom,
+          center: new google.maps.LatLng(_sfLatitudeLongitude[0], _sfLatitudeLongitude[1])
+        };
+        _map = new google.maps.Map($("#map")[0], mapOptions);
     }
 
     /*
@@ -38,9 +34,7 @@
      */
     this.MapController = function() {
         return {
-            getSFLatitudeLongitude: getSFLatitudeLongitude,
-            getDefaultZoom: getDefaultZoom,
-            initMap: initMap
+            init: init,
         }
     };
 
