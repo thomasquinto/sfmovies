@@ -17,7 +17,8 @@ gm.config( { "key": "AIzaSyDATd6iwCHxJUErroouJEelUB5VJ1LYjdE" } )
 // Http Client for external web services API requests:
 var http = require('http')
 
-var routes = require('./routes/routes');
+var requireDir = require('require-dir');
+var routes = requireDir('./routes');
 
 var app = express();
 
@@ -42,7 +43,12 @@ app.use(function(req,res,next){
     next();
 });
 
-app.use('/', routes);
+// routes:
+app.get('/', routes.index);
+app.get('/about', routes.about);
+app.get('/movie_list', routes.movie_list);
+app.get('/geocode', routes.geocode);
+app.get('/match_shows', routes.match_shows);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
