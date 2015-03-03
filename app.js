@@ -14,6 +14,9 @@ var db = monk('localhost:27017/sfmovies');
 var gm = require('googlemaps');
 gm.config( { "key": "AIzaSyDATd6iwCHxJUErroouJEelUB5VJ1LYjdE" } )
 
+// Http Client for external web services API requests:
+var http = require('http')
+
 var routes = require('./routes/routes');
 
 var app = express();
@@ -31,10 +34,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-// Make MongoDB accessible to router
+// Make MongoDB/Google Maps/Http accessible to router
 app.use(function(req,res,next){
     req.db = db;
     req.gm = gm;
+    req.http = http;
     next();
 });
 
