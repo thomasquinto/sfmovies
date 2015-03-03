@@ -10,6 +10,10 @@ var mongo = require('mongodb');
 var monk = require('monk');
 var db = monk('localhost:27017/sfmovies');
 
+// Node Google Maps:
+var gm = require('googlemaps');
+gm.config( { "key": "AIzaSyDATd6iwCHxJUErroouJEelUB5VJ1LYjdE" } )
+
 var routes = require('./routes/routes');
 
 var app = express();
@@ -30,6 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Make MongoDB accessible to router
 app.use(function(req,res,next){
     req.db = db;
+    req.gm = gm;
     next();
 });
 
