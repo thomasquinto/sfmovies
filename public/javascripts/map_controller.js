@@ -21,6 +21,8 @@
      */ 
     var _map = null;
 
+    var _markers = [];
+
     function init() {
         var mapOptions = {
             zoom: _defaultZoom,
@@ -30,9 +32,8 @@
         _map = new google.maps.Map($("#map")[0], mapOptions);
 
         google.maps.event.addListener(_map, "idle", function() {
-            //TODO: send the new bounds back to server to refresh movie location markers
-
             console.log("map bounds: " + _map.getBounds());
+            placeMarkers();
         });
 
         placeMarkers();
@@ -40,56 +41,66 @@
 
     function placeMarkers() {
         $.ajax(
-          {url: "locations.json",
-           data: { "exists": "geocodes,show_data", "limit":"100" },
-           success: function(response) {
-            _.each(response.locations, function(location) {
-                console.log("location title: " + location.title);
+            {
+                url: "locations.json",
+                data: { "bounds": _map.getBounds().toString(), "exists": "loc,show_data", "limit":"100" },
+                success: placeMarkersCallback
+            }
+        );
+    }
 
-                var latLng = new google.maps.LatLng(location.geocodes[0].geometry.location.lat, location.geocodes[0].geometry.location.lng);
-                var markerOptions = {
-                    position: latLng,
-                    title: location.title + " (" + location.locations + ")",
-                    map: _map
-                };
+    function placeMarkersCallback(response) {
+       
+        for (var i = 0; i < _markers.length; i++) {
+            _markers[i].setMap(null);
+        }
+        _markers = [];
 
-                var marker = new google.maps.Marker(markerOptions);
-
-                marker.setMap(_map);
-
-                google.maps.event.addListener(marker, 'click', function() {
-                    markerClicked(location);
+        _.each(response.locations, function(location) {
+            console.log("location title: " + location.title);
+            
+            var latLng = new google.maps.LatLng(location.loc[0], location.loc[1]);
+            var markerOptions = {
+                position: latLng,
+                title: location.title + " (" + location.locations + ")",
+                map: _map
+            };
+            
+            var marker = new google.maps.Marker(markerOptions);
+            
+            marker.setMap(_map);
+            _markers.push(marker);
+            
+            google.maps.event.addListener(marker, 'click', function() {
+                markerClicked(location);
+            });
+            
+            if(location.show_data && location.show_data.images) {
+                
+                var sortedImages = _.sortBy(location.show_data.images, function(image) { return image.width; });
+                
+                var thumbnailImage = _.find(sortedImages, function(image) {
+                    if(image.category.indexOf('Box Art') > -1) {
+                        return image;
+                    }
                 });
                 
-                if(location.show_data && location.show_data.images) {
-
-                    var sortedImages = _.sortBy(location.show_data.images, function(image) { return image.width; });
-
-                    var thumbnailImage = _.find(sortedImages, function(image) {
-                        if(image.category.indexOf('Box Art') > -1) {
-                            return image;
-                        }
+                if(thumbnailImage) {
+                    
+                    var infoWindow = new google.maps.InfoWindow({
+                        content: "<img class='infowindow_img' src='" + thumbnailImage.url + "' />"
                     });
-
-                    if(thumbnailImage) {
-
-                        var infoWindow = new google.maps.InfoWindow({
-                            content: "<img class='infowindow_img' src='" + thumbnailImage.url + "' />"
-                        });
-                        
-                        google.maps.event.addListener(marker, 'mouseover', function() {
-                            infoWindow.open(_map, marker);
-                        });
-
-                        google.maps.event.addListener(marker, 'mouseout', function() {
-                            infoWindow.close();
-                        });
-                        
-                    }
+                    
+                    google.maps.event.addListener(marker, 'mouseover', function() {
+                        infoWindow.open(_map, marker);
+                    });
+                    
+                    google.maps.event.addListener(marker, 'mouseout', function() {
+                        infoWindow.close();
+                    });                    
                 }
-
-            });
-        }});
+            }            
+        });   
     }
 
     function markerClicked(location) {

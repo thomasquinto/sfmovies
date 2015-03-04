@@ -47,6 +47,7 @@ app.use(function(req,res,next){
 app.get('/', routes.index);
 app.get('/about', routes.about);
 app.get('/geocode', routes.geocode);
+app.get('/geo_index', routes.geocode);
 app.get('/match_shows', routes.match_shows);
 app.get('/locations', routes.locations);
 app.get('/locations.json', routes.locations);

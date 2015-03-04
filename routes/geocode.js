@@ -3,6 +3,8 @@ var router = express.Router();
 
 /* GET geocode.
  * Iterates over each movie location and performs a Google Maps Geocode API request to populate geocode results.
+ * To create geospatial index in mongo console for 'loc' parameter:
+ * > db.movie_locations.createIndex( { loc: "2d" }, { min : -500,  max : 500,  w :1} );
  */
 router.get('/geocode', function(req, res) {
     var db = req.db;
@@ -15,19 +17,23 @@ router.get('/geocode', function(req, res) {
         var i = start;
         var timeoutInterval = 1000;
 
-        function setLocation(movie) {
+        function setLocation(location) {
 
             // See: https://developers.google.com/maps/documentation/geocoding/?csw=1#GeocodingRequests
-            gm.geocode(movie.locations, function(err, data) {
+            gm.geocode(location.locations, function(err, data) {
 
                 console.log('---------------------------\n');
-                console.log('Title: %s, Location: %s', movie.title, movie.locations);        
+                console.log('Title: %s, Location: %s', location.title, location.locations);        
                 console.log('Geo data: %s', JSON.stringify(data));
                 console.log('Results: {}', data['results']);
 
-                if(data['results'] && data['results'].length) {
-                    collection.update( {'_id' : movie._id}, 
+                if(data.results && data.results.length) {
+                    collection.update( {'_id' : location._id}, 
                                        {$set : { 'geocodes' : data['results'] }} );
+
+                    collection.update( {'_id' : location._id}, 
+                                       {$set : { 'loc' : [ data.results[0].geometry.location.lat,
+                                                           data.results[0].geometry.location.lng] }} );
                 }
             }, 
                // options hash:
