@@ -40,10 +40,16 @@
     }
 
     function placeMarkers() {
+
+        var data = { "exists": "loc,show_data", "limit":"100" };
+        if(_map && _map.getBounds()) {
+            data.bounds = _map.getBounds().toString();
+        }
+
         $.ajax(
             {
                 url: "locations.json",
-                data: { "bounds": _map.getBounds().toString(), "exists": "loc,show_data", "limit":"100" },
+                data: data,
                 success: placeMarkersCallback
             }
         );
@@ -57,7 +63,7 @@
         _markers = [];
 
         _.each(response.locations, function(location) {
-            console.log("location title: " + location.title);
+            //console.log("location title: " + location.title);
             
             var latLng = new google.maps.LatLng(location.loc[0], location.loc[1]);
             var markerOptions = {
@@ -113,8 +119,6 @@
                 '<p><%= location.locations %></p>' +
              '</div>'
         )( { location: location } );
-
-        console.log("html: " + html);
 
         $('#show').empty();
         $('#show').append(html);
