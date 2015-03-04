@@ -29,12 +29,21 @@
         };
         _map = new google.maps.Map($("#map")[0], mapOptions);
 
+        google.maps.event.addListener(_map, "idle", function() {
+            //TODO: send the new bounds back to server to refresh movie location markers
+
+            console.log("map bounds: " + _map.getBounds());
+        });
+
         placeMarkers();
     }
 
     function placeMarkers() {
-        $.ajax({url: "locations.json", success: function(locations) {
-            _.each(locations, function(location) {
+        $.ajax(
+          {url: "locations.json",
+           data: { "exists": "geocodes,show_data", "limit":"100" },
+           success: function(response) {
+            _.each(response.locations, function(location) {
                 console.log("location title: " + location.title);
 
                 var latLng = new google.maps.LatLng(location.geocodes[0].geometry.location.lat, location.geocodes[0].geometry.location.lng);
@@ -75,6 +84,7 @@
                         google.maps.event.addListener(marker, 'mouseout', function() {
                             infoWindow.close();
                         });
+                        
                     }
                 }
 

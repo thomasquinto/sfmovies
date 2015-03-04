@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <% include partials/header %>
+  <body>
+
+    <% include partials/navbar %>
+    
+    <div class="container">
+      
+      <ul>
+        <% for(var i=0; i<locations.length; i++) {%>
+           <li>
+             <table>
+               <tr><td>Title:</td><td><%= locations[i].title %></td></tr>
+               <tr><td>Release Year:</td><td><%= locations[i].release_year %></td></tr>
+               <tr><td>Location:</td><td><%= locations[i].locations %></td></tr>
+               <tr><td>Director:</td><td><%= locations[i].director %></td></tr>
+               <tr><td>Writer:</td><td><%= locations[i].writer %></td></tr>              
+               <% if(locations[i].actor_1) { %>
+               <tr><td>Actor 1:</td><td><%= locations[i].actor_1 %></td></tr>
+               <% } %>
+               <% if(locations[i].actor_2) { %>
+               <tr><td>Actor 2:</td><td><%= locations[i].actor_2 %></td></tr>
+               <% } %>
+               <% if(locations[i].actor_3) { %>
+               <tr><td>Actor 3:</td><td><%= locations[i].actor_3 %></td></tr>
+               <% } %>
+               <% if(locations[i].production_company) { %>
+               <tr><td>Production Company:</td><td><%= locations[i].production_company %></td></tr>
+               <% } %>
+               <% if(locations[i].distributor) { %>
+               <tr><td>Distributor:</td><td><%= locations[i].distributor %></td></tr>
+               <% } %>
+               <% if(locations[i].fun_facts) { %>
+               <tr><td>Fun Facts:</td><td><%= locations[i].fun_facts %></td></tr>
+               <% } %>
+               <% if(locations[i].geocodes) { %>
+               <tr><td>Google Maps Address:</td><td><%= locations[i].geocodes[0].formatted_address %></td></tr>
+               <tr><td>Latitude/Longitude:</td><td><%= locations[i].geocodes[0].geometry.location.lat %>/<%= locations[i].geocodes[0].geometry.location.lng %></td></tr>
+               <% } %>
+               <% if(locations[i].show_data) { %>
+               <tr><td>Matched Show:</td><td><a href="http://nextguide.tv/<%= locations[i].show_data.dijit_id %>"><%= locations[i].show_data.t %></a></td></tr>
+               <% } %>
+
+             </table>
+           </li>
+        <% } %>
+      </ul>
+      
+      <% include partials/footer %>
+    </div>
+    <!-- /container -->
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+
+      });
+    </script>
+
+    <% include partials/js_include %>
+
+  </body>
+</html>
