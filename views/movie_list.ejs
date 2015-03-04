@@ -34,6 +34,14 @@
                <% if(movies[i].fun_facts) { %>
                <tr><td>Fun Facts:</td><td><%= movies[i].fun_facts %></td></tr>
                <% } %>
+               <% if(movies[i].geocodes) { %>
+               <tr><td>Google Maps Address:</td><td><%= movies[i].geocodes[0].formatted_address %></td></tr>
+               <tr><td>Latitude/Longitude:</td><td><%= movies[i].geocodes[0].geometry.location.lat %>/<%= movies[i].geocodes[0].geometry.location.lng %></td></tr>
+               <% } %>
+               <% if(movies[i].show_data) { %>
+               <tr><td>Matched Show:</td><td><a href="http://nextguide.tv/<%= movies[i].show_data.dijit_id %>"><%= movies[i].show_data.t %></a></td></tr>
+               <% } %>
+
              </table>
            </li>
         <% } %>
@@ -45,7 +53,7 @@
 
     <script type="text/javascript">
       $(document).ready(function() {
-        $('#about').addClass("active");
+
       });
     </script>
 

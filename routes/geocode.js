@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET geocode. */
+/* GET geocode.
+ * Iterates over each movie location and performs a Google Maps Geocode API method for each.
+ */
 router.get('/geocode', function(req, res) {
     var db = req.db;
     var collection = db.get('movie_locations');
