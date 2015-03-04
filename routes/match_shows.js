@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET match_shows. */
+/* GET match_shows. 
+ * Iterates over each movie location and performs a NextGuide search request to populate show data.
+*/
 router.get('/match_shows', function(req, res) {
     var db = req.db;
     var collection = db.get('movie_locations');
@@ -11,9 +13,9 @@ router.get('/match_shows', function(req, res) {
         var start = 0;
         var limit = docs.length;
         var i = start;
-        var timeoutInterval = 1000;
+        var timeoutInterval = 10;
 
-        function setTmsId(movie) {
+        function setShowData(movie) {
             
             console.log('Movie Title: {}', movie.title);
 
@@ -47,7 +49,7 @@ router.get('/match_shows', function(req, res) {
 
                     if(i < start+limit) { 
                         console.log('Iteration ' + i);
-                        setTimeout(function() { setTmsId(docs[i++]) }, timeoutInterval);
+                        setTimeout(function() { setShowData(docs[i++]) }, timeoutInterval);
                     }
                 });
 
@@ -57,11 +59,11 @@ router.get('/match_shows', function(req, res) {
 
         }
         
-        setTimeout(function() { setTmsId(docs[i++]) }, timeoutInterval);
+        setTimeout(function() { setShowData(docs[i++]) }, timeoutInterval);
 
-        res.render('movie_list', {
+        res.render('locations', {
             'title' : 'SF Movie Map',
-            'movies' : docs,
+            'locations' : docs,
         });
 
     });

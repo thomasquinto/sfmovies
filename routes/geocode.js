@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 /* GET geocode.
- * Iterates over each movie location and performs a Google Maps Geocode API method for each.
+ * Iterates over each movie location and performs a Google Maps Geocode API request to populate geocode results.
  */
 router.get('/geocode', function(req, res) {
     var db = req.db;
@@ -46,9 +46,9 @@ router.get('/geocode', function(req, res) {
 
         setTimeout(function() { setLocation(docs[i++]) }, timeoutInterval);
 
-        res.render('movie_list', {
+        res.render('locations', {
             'title' : 'SF Movie Map',
-            'movies' : docs,
+            'locations' : docs,
         });
     });
 });
