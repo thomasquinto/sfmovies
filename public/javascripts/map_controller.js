@@ -23,6 +23,9 @@
 
     var _markers = [];
 
+    var _states = [ 'update_on_bounds', 'show_selected' ];
+    var _state = _states[0];
+
     function init() {
         var mapOptions = {
             zoom: _defaultZoom,
@@ -32,19 +35,36 @@
         _map = new google.maps.Map($("#map")[0], mapOptions);
 
         google.maps.event.addListener(_map, "idle", function() {
-            console.log("map bounds: " + _map.getBounds());
+            //console.log("map bounds: " + _map.getBounds());
             placeMarkersForBounds();
         });
 
         placeMarkersForBounds();
+
+        $('.redo :checkbox').click(function() {
+            var $this = $(this);
+            if ($this.is(':checked')) {
+                _state = 'update_on_bounds';
+            } else {                
+                _state = 'show_selected';
+            }
+        });
     }
 
     function placeMarkersForTitle(title) {
         var data = { "title": title, "limit":"100" };
+        
+        $('.redo :checkbox').prop('checked', false);
+        _state = 'show_selected';
+
         placeMarkers(data);
     }
 
     function placeMarkersForBounds() {
+        if(_state != 'update_on_bounds') return;
+
+        $('#search').val('');
+        
         var data = { "exists": "loc,show_data", "limit":"100" };
         placeMarkers(data);
     }
@@ -81,6 +101,7 @@
             };
             
             var marker = new google.maps.Marker(markerOptions);
+            marker.location = location;
             
             marker.setMap(_map);
             _markers.push(marker);
@@ -104,8 +125,16 @@
                     var infoWindow = new google.maps.InfoWindow({
                         content: "<img class='infowindow_img' src='" + thumbnailImage.url + "' />"
                     });
+
+                    marker.infoWindow = infoWindow;
                     
                     google.maps.event.addListener(marker, 'mouseover', function() {
+                        for(var i=0;i<_markers.length;i++) {
+                            if(_markers[i].infoWindow) {
+                                _markers[i].infoWindow.close();
+                            }
+                        }
+
                         infoWindow.open(_map, marker);
                     });
                     
@@ -114,7 +143,15 @@
                     });                    
                 }
             }            
+
         });   
+
+        if(_state == 'show_selected' && _markers.length) {
+            var marker = _markers[0];            
+            marker.infoWindow.open(_map, marker);
+            markerClicked(marker.location);
+        }
+     
     }
 
     function markerClicked(location) {

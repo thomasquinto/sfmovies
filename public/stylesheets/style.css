@@ -21,6 +21,14 @@ a {
     max-height: 100px;
 }
 
+#search {
+    margin-right: 20px;
+}
+
+label.redo {
+    font-weight: normal;
+}
+
 /* Bootstrap styling for jQuery autocomplete */
 .ui-autocomplete {
     position: absolute;
