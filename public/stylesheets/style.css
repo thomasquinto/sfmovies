@@ -23,7 +23,7 @@ a {
 
 #search {
     margin-right: 20px;
-    font-weight: normal;
+    min-width: 160px;
 }
 
 label.redo {
