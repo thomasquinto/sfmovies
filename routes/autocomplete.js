@@ -2,11 +2,11 @@ var express = require('express');
 var router = express.Router();
 var Autocomplete = require('autocomplete')
 var auto;
+var lowerToOriginal = {};
 
 /* GET autocomplete.
  * Returns autocomplete results for movie title.
  */
-
 router.get('/autocomplete.json', function(req, res) {
 
     var phrase = req.query.phrase.toLowerCase();
@@ -23,7 +23,7 @@ router.get('/autocomplete.json', function(req, res) {
 function getResults(phrase) {
     var results = auto.search(phrase);
     for(var i=0; i<results.length; i++) {
-        results[i] = toTitleCase(results[i]);
+        results[i] = lowerToOriginal[results[i]];
     }
     return results;
 }
@@ -37,9 +37,10 @@ function init(db, res, phrase) {
                                  var titles = [];
                                  for(var i=0; i<docs.length; i++) {
                                      var title = docs[i]._id;
-                                     title = title.replace('"', '');
-                                     title = title.toLowerCase();
-                                     titles.push(title);
+                                     var lower = title.replace('"', '');
+                                     lower = lower.toLowerCase();
+                                     lowerToOriginal[lower] = title;
+                                     titles.push(lower);
                                  }
                                  
                                  auto = new Autocomplete.connectAutocomplete();
@@ -52,10 +53,6 @@ function init(db, res, phrase) {
                                      }
                                  });
                              });
-}
-
-function toTitleCase(str) {
-    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
 module.exports = router;

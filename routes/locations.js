@@ -52,6 +52,10 @@ function getCriteria(req) {
         criteria.loc = { $within: { $box: boundsBox } }
     }
 
+    if(req.query.title) {
+        criteria.title = req.query.title;
+    }
+
     console.log('criteria: ' + JSON.stringify(criteria));
 
     return criteria;
