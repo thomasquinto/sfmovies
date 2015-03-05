@@ -5,15 +5,14 @@
  */ 
 ;(function($, _) {
 
-    var _mapController;
-
     function init(mapController) {
-        // Need a reference to mapController in order to notify when a movie has been selected
-        _mapController = mapController;
-
         $( '#search' ).autocomplete({
             source: doSearch,
-            select: doSelect
+            select: doSelect,
+            messages: {
+                noResults: '',
+                results: function() {}
+            }
         });
     }
 
