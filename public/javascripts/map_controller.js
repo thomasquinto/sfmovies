@@ -33,15 +33,23 @@
 
         google.maps.event.addListener(_map, "idle", function() {
             console.log("map bounds: " + _map.getBounds());
-            placeMarkers();
+            placeMarkersForBounds();
         });
 
-        placeMarkers();
+        placeMarkersForBounds();
     }
 
-    function placeMarkers() {
+    function placeMarkersForTitle(title) {
+        var data = { "title": title, "limit":"100" };
+        placeMarkers(data);
+    }
 
+    function placeMarkersForBounds() {
         var data = { "exists": "loc,show_data", "limit":"100" };
+        placeMarkers(data);
+    }
+
+    function placeMarkers(data) {
         if(_map && _map.getBounds()) {
             data.bounds = _map.getBounds().toString();
         }
@@ -131,6 +139,7 @@
     this.MapController = function() {
         return {
             init: init,
+            placeMarkersForTitle: placeMarkersForTitle
         }
     };
 

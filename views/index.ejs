@@ -6,6 +6,13 @@
     <% include partials/navbar %>
     
     <div class="container">
+
+      <!-- Autocomplete search box -->
+      <div class="ui-widget">
+        <label for="search">Search Title: </label>
+        <input id="search" />
+      </div>
+
       <!-- Anchor the map to this div -->
       <div id="map"></div>      
     </div>
@@ -41,11 +48,15 @@
       }
       
       function initialize() {
-        MapController().init();
+        MapController().init();      
+        SearchController().init();
       }
     </script>
 
     <% include partials/js_include %>
+
+    <!-- Search Controller (for auto-complete results on movie title) -->
+    <script src="/javascripts/search_controller.js"></script>
 
     <!-- Map Controller (our code for map handling) -->
     <script src="/javascripts/map_controller.js"></script>
