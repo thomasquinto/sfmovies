@@ -1,15 +1,20 @@
-var express = require('express');
-var router = express.Router();
+#!/usr/bin/env node
 
-/* GET match_shows. 
+// Http Client for external web services API requests:
+var http = require('http')
+
+// MongoDB:
+var mongo = require('mongodb');
+var monk = require('monk');
+var db = monk('localhost:27017/sfmovies');
+
+/**
  * Iterates over each movie location and performs a NextGuide search request to populate show data.
-*/
-router.get('/match_shows', function(req, res) {
-    var db = req.db;
+ */
+function matchShows() {
     var collection = db.get('movie_locations');
     collection.find({}, {}, function(e, docs) {
 
-        var http = req.http;
         var start = 0;
         var limit = docs.length;
         var i = start;
@@ -17,8 +22,6 @@ router.get('/match_shows', function(req, res) {
 
         function setShowData(movie) {
             
-            console.log('Movie Title: {}', movie.title);
-
             var options = {
                 host: 'api-guide.nextguide.tv',
                 port: 80,
@@ -27,6 +30,7 @@ router.get('/match_shows', function(req, res) {
 
             http.get(options, function(response) {
                 console.log('---------------------------\n');
+                console.log('Movie Title: %s', movie.title);
                 console.log('response code: ' + response.statusCode);
 
                 // Continuously update stream with data
@@ -40,7 +44,7 @@ router.get('/match_shows', function(req, res) {
                     // Data reception is done, do whatever with it!
                     var parsed = JSON.parse(body);
 
-                    console.log('parsed: ' + JSON.stringify(parsed));
+                    console.log('NextGuide show data: %s', JSON.stringify(parsed));
 
                     if(parsed.movies && parsed.movies[0] && parsed.movies[0].field_matches == 't') {
                         collection.update( {'_id' : movie._id}, 
@@ -54,19 +58,14 @@ router.get('/match_shows', function(req, res) {
                 });
 
             }).on('error', function(e) {           
-                console.log('Got error for movie title {}: {}' + movie.title, e.message);
+                console.log('Got error for movie title %s: %s', movie.title, e.message);
             });
 
         }
         
         setTimeout(function() { setShowData(docs[i++]) }, timeoutInterval);
 
-        res.render('locations', {
-            'title' : 'SF Movie Map',
-            'locations' : docs,
-        });
-
     });
-});
+}
 
-module.exports = router;
+matchShows();

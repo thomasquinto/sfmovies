@@ -10,13 +10,6 @@ var mongo = require('mongodb');
 var monk = require('monk');
 var db = monk('localhost:27017/sfmovies');
 
-// Node Google Maps:
-var gm = require('googlemaps');
-gm.config( { "key": "AIzaSyDATd6iwCHxJUErroouJEelUB5VJ1LYjdE" } )
-
-// Http Client for external web services API requests:
-var http = require('http')
-
 var requireDir = require('require-dir');
 var routes = requireDir('./routes');
 
@@ -38,17 +31,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Make MongoDB/Google Maps/Http accessible to router
 app.use(function(req,res,next){
     req.db = db;
-    req.gm = gm;
-    req.http = http;
     next();
 });
 
 // routes:
 app.get('/', routes.index);
 app.get('/about', routes.about);
-app.get('/geocode', routes.geocode);
-app.get('/geo_index', routes.geocode);
-app.get('/match_shows', routes.match_shows);
 app.get('/locations', routes.locations);
 app.get('/locations.json', routes.locations);
 app.get('/autocomplete.json', routes.autocomplete);
