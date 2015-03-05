@@ -2,9 +2,10 @@ var express = require('express');
 var router = express.Router();
 var Autocomplete = require('autocomplete')
 var auto;
-var lowerToOriginal = {};
+var scrubbedToOriginal = {};
 
-/* GET autocomplete.
+/**
+ * GET automplete
  * Returns autocomplete results for movie title.
  */
 router.get('/autocomplete.json', function(req, res) {
@@ -23,7 +24,7 @@ router.get('/autocomplete.json', function(req, res) {
 function getResults(phrase) {
     var results = auto.search(phrase);
     for(var i=0; i<results.length; i++) {
-        results[i] = lowerToOriginal[results[i]];
+        results[i] = scrubbedToOriginal[results[i]];
     }
     return results;
 }
@@ -37,10 +38,22 @@ function init(db, res, phrase) {
                                  var titles = [];
                                  for(var i=0; i<docs.length; i++) {
                                      var title = docs[i]._id;
+
                                      var lower = title.replace('"', '');
                                      lower = lower.toLowerCase();
-                                     lowerToOriginal[lower] = title;
+
+                                     scrubbedToOriginal[lower] = title;
                                      titles.push(lower);
+
+                                     // Enable search matches without first-word articles:
+                                     var startsWithMembers = ['a ', 'an ', 'the '];
+                                     for(var j=0; j < startsWithMembers.length; j++) {
+                                         if(lower.lastIndexOf(startsWithMembers[j], 0) === 0) {
+                                             var chopped = lower.substring(startsWithMembers[j].length);
+                                             scrubbedToOriginal[chopped] = title;
+                                             titles.push(chopped);
+                                         }
+                                     }
                                  }
                                  
                                  auto = new Autocomplete.connectAutocomplete();
