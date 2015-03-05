@@ -8,24 +8,27 @@ var auto;
  */
 
 router.get('/autocomplete.json', function(req, res) {
+
+    var phrase = req.query.phrase.toLowerCase();
+    console.log('phrase: ' + phrase);
+
     if(!auto) {
-        console.log('Building Trie! No results yet.');
-        init(req.db);
-        res.send({ 'autocomplete' : [] });
+        console.log('Initializing Trie...');
+        init(req.db, res, phrase);
     } else {
-        var phrase = req.query.phrase;//.toLowerCase();
-        console.log('phrase: ' + phrase);
-
-        var results = auto.search(phrase);
-        for(var i=0; i<results.length; i++) {
-            results[i] = toTitleCase(results[i]);
-        }
-
-        res.send({ 'autocomplete' : results });
+        res.send({ 'autocomplete' : getResults(phrase) });
     }
 });
 
-function init(db, callback) {
+function getResults(phrase) {
+    var results = auto.search(phrase);
+    for(var i=0; i<results.length; i++) {
+        results[i] = toTitleCase(results[i]);
+    }
+    return results;
+}
+
+function init(db, res, phrase) {
     var collection = db.get('movie_locations');
 
     // > db.movie_locations.aggregate( { $group : { _id: '$title' } } )
@@ -43,6 +46,10 @@ function init(db, callback) {
                                  auto.initialize(function(onReady) {
                                      onReady(titles);
                                      console.log('Trie initialized!');
+
+                                     if(phrase) {
+                                         res.send({ 'autocomplete' : getResults(phrase) });
+                                     }
                                  });
                              });
 }
