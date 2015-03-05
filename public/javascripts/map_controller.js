@@ -14,7 +14,7 @@
     /*
      * Default "Zoom" parameter:
      */
-    var _defaultZoom = 12;
+    var _defaultZoom = 13;
 
     /*
      * Reference to map instance:
@@ -62,6 +62,14 @@
 
     function placeMarkersForBounds() {
         if(_state != 'update_on_bounds') return;
+
+        // Don't update if map is moving because of infowindow being auto-panned:
+        for(var i=0;i<_markers.length;i++) {
+            if(_markers[i].infoWindow && _markers[i].infoWindow.opened) {
+                return;
+            }
+        }
+
 
         $('#search').val('');
         
@@ -121,7 +129,7 @@
                 });
                 
                 if(thumbnailImage) {
-                    
+                                        
                     var infoWindow = new google.maps.InfoWindow({
                         content: "<img class='infowindow_img' src='" + thumbnailImage.url + "' />"
                     });
@@ -132,14 +140,17 @@
                         for(var i=0;i<_markers.length;i++) {
                             if(_markers[i].infoWindow) {
                                 _markers[i].infoWindow.close();
+                                _markers[i].infoWindow.opened = false;
                             }
                         }
 
                         infoWindow.open(_map, marker);
+                        infoWindow.opened = true;
                     });
-                    
+
                     google.maps.event.addListener(marker, 'mouseout', function() {
                         infoWindow.close();
+                        infoWindow.opened = false;
                     });                    
                 }
             }            
