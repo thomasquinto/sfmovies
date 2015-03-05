@@ -51,6 +51,7 @@ app.get('/geo_index', routes.geocode);
 app.get('/match_shows', routes.match_shows);
 app.get('/locations', routes.locations);
 app.get('/locations.json', routes.locations);
+app.get('/autocomplete.json', routes.autocomplete);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
