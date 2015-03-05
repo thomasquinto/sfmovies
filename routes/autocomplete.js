@@ -32,11 +32,13 @@ function getResults(phrase) {
 function init(db, res, phrase) {
     var collection = db.get('movie_locations');
 
-    // > db.movie_locations.aggregate( { $group : { _id: '$title' } } )
-    collection.col.aggregate([{ '$group' : { _id: '$title' } }], {},
+    // For entries with existing locations, group by title:
+    // > db.movie_locations.aggregate( [ { $match : { 'loc': { $exists: 1} } }, { $group : { _id: '$title' } }] );
+    collection.col.aggregate([{ $match : { 'loc': { $exists: 1} } }, { '$group' : { _id: '$title' } }], {},
                              function(e, docs) {            
                                  var titles = [];
                                  for(var i=0; i<docs.length; i++) {
+
                                      var title = docs[i]._id;
 
                                      var lower = title.replace('"', '');

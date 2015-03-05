@@ -37,9 +37,14 @@ function geocodeLocations() {
                     collection.update( {'_id' : location._id}, 
                                        {$set : { 'geocodes' : data['results'] }} );
 
-                    collection.update( {'_id' : location._id}, 
-                                       {$set : { 'loc' : [ data.results[0].geometry.location.lat,
-                                                           data.results[0].geometry.location.lng] }} );
+                    var loc = [ data.results[0].geometry.location.lat,
+                                data.results[0].geometry.location.lng];
+
+                    // Throw out locations outside of SF bounding box:
+                    if(isLocationWithinSF(loc)) {
+                        collection.update( {'_id' : location._id}, 
+                                           {$set : { 'loc' : loc }} );
+                    }
                 }
             }, 
                // options hash:
@@ -59,6 +64,17 @@ function geocodeLocations() {
 
         setTimeout(function() { setLocation(docs[i++]) }, timeoutInterval);
     });
+}
+
+var sfBoundingBox = [ [37.59975669590035, -122.80242311401366], [37.941701510621506, -122.01964723510741] ];
+
+function isLocationWithinSF(loc) {
+    console.log('loc: %s', JSON.stringify(loc));
+
+    return loc[0] >= sfBoundingBox[0][0] && 
+        loc[0] <= sfBoundingBox[1][0] &&
+        loc[1] >= sfBoundingBox[0][1] && 
+        loc[1] <= sfBoundingBox[1][1];
 }
 
 geocodeLocations();
