@@ -27,7 +27,7 @@
                 data: { 'phrase' : $('#search').val() },
                 success: function(response) {
                     if(response.autocomplete) {
-                        console.log('resp:' + response.autocomplete);
+                        //console.log('resp: ' + response.autocomplete);
                         res(response.autocomplete);
                     }                
                 }
@@ -36,7 +36,7 @@
     }
 
     function doSelect(event, ui) {
-        console.log("value: " + ui.item.value);
+        //console.log("value: " + ui.item.value);
         MapController().placeMarkersForTitle(ui.item.value);
     }
 

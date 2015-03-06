@@ -68,7 +68,7 @@
      * Places markers for locations for a single Movie Title.
      */
     function placeMarkersForTitle(title) {
-        var data = { "title": title, "limit":"100" };
+        var data = { "title": title, "exists": "loc", "limit":"100" };
         
         $('.redo :checkbox').prop('checked', false);
         _state = _state_show_selected;
@@ -93,6 +93,11 @@
         $('#search').val('');
         
         var data = { "exists": "loc", "limit":"100" };
+
+        if(_map && _map.getBounds()) {
+            data.bounds = _map.getBounds().toString();
+        }
+
         placeMarkers(data);
     }
 
@@ -100,10 +105,6 @@
      * Places markers based on 'data' hash options.
      */
     function placeMarkers(data) {
-        if(_map && _map.getBounds()) {
-            data.bounds = _map.getBounds().toString();
-        }
-
         $.ajax(
             {
                 url: "locations.json",
@@ -118,7 +119,7 @@
      */
     function placeMarkersCallback(response) {
 
-        //console.log("response total locations: " + responase.locations.length);
+        //console.log("response total locations: " + response.locations.length);
        
         // Find new markers to add, remove current markers not in new response,
         // and retain/leave alone existing (i.e. don't remove and redraw them)
@@ -165,6 +166,7 @@
 
         // If 'show selected' state, pop-up InfoWindow for first Marker:
         if(_state == _state_show_selected && _markers.length) {
+            
             for(var i=0; i<_markers.length; i++) {
                 var marker = _markers[i];            
                 if(marker) {
@@ -172,8 +174,48 @@
                     markerClicked(marker.location);
                     break;
                 }
+
+                // Fit all locations for the selected show by changing map bounds:
+                if(response.locations && response.locations.length > 1) {
+                    fitMapWithinBoundsOfLocations(response.locations);
+                }
             }
-        }     
+        }
+    }
+
+    /**
+     * Changes bounds of map to encompass all locations in array.
+     */
+    function fitMapWithinBoundsOfLocations(locations) {
+
+        var minLat;
+        var minLon;
+        var maxLat;
+        var maxLon;
+                
+        for(var i=0; i < locations.length; i++) {            
+            var loc = locations[i].loc;
+            
+            if(!minLat) minLat = loc[0];
+            else if(loc[0] < minLat) minLat = loc[0];
+            
+            if(!minLon) minLon = loc[1];
+            else if(loc[1] < minLon) minLon = loc[1];
+            
+            if(!maxLat) maxLat = loc[0];
+            else if(loc[0] > maxLat) maxLat = loc[0];
+            
+            if(!maxLon) maxLon = loc[1];
+            else if(loc[1] > maxLon) maxLon = loc[1];
+        }
+        
+        //console.log('(minLat: %d, minLon: %d), (maxLat: %d, maxLon: %d)', minLat, minLon, maxLat, maxLon);
+        if(minLat && minLon && maxLat && maxLon) {
+            _map.fitBounds(new google.maps.LatLngBounds(
+                new google.maps.LatLng(minLat, minLon),
+                new google.maps.LatLng(maxLat, maxLon))
+            );
+        }
     }
 
     /**
