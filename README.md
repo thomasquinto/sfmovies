@@ -11,46 +11,49 @@ Then, on unix command-line within application home directory:
 
 1) Download raw SF film location data as JSON from data.sfgov.org:
 
-wget --no-check-certificate https://data.sfgov.org/resource/yitu-d5am.json
+`wget --no-check-certificate https://data.sfgov.org/resource/yitu-d5am.json`
 
 2) Create data directory, and start mongo:
 
-mkdir data
-mongod --dbpath ./data
+`mkdir data`  
+`mongod --dbpath ./data`
 
 3) Import film location JSON into mongo: 
 
-mongoimport --jsonArray -d sfmovies --collection movie_locations --file yitu-d5am.json
+`mongoimport --jsonArray -d sfmovies --collection movie_locations --file yitu-d5am.json`
 
 4) Run node.js script to gather geocoded data from Google Maps API: 
 
-script/geocode.js
+`script/geocode.js`
 
 5) Run node.js script to gather movie metadata (like Box Art image) from NextGuide API: 
 
-script/match_shows.js
+`script/match_shows.js`
 
 6) In mongo client, create a geo-spatial index for fast querying of movie locations based on latitude/longitude:
-  > db.movie_locations.createIndex( { loc: "2d" }, { min : -500,  max : 500,  w :1 } );
+
+  `mongo`  
+  `> use sfmovies;`  
+  `> db.movie_locations.createIndex( { loc: "2d" }, { min : -500,  max : 500,  w :1 } );`
     
 ## Usage
 
 In application home directory:
 (This may require root admin access/password since it's configured to run on Port 80 by default.)
 
-node app.js
-OR
-sudo node app.js
+node app.js  
+OR  
+sudo node app.js  
 
 Now open a browser and go to 'http://localhost'.
 
 ## Technology
 
-Node.js
-MongoDB
-Google Maps Javascript API v3
-jQuery
-Bootstrap
+Node.js  
+MongoDB  
+Google Maps Javascript API v3  
+jQuery  
+Bootstrap  
 
 ## License
 
