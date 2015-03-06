@@ -1,6 +1,6 @@
 # SF Movie Map (sfmovies)
 
-A simple web application built on Node.js, MongoDB, and Google Maps JavaScript API that displays San Francisco film locations on a map. The map updates film location markers as the map moves (an option that can be disabled by a checkbox), and a search box presents auto-completed results based on movie title. Choosing a search result will limit film locations to just that movie, as well as display more detailed metadata about the movie in a pane below the map. Clicking on any location will also populate the show detail pane.
+A simple web application built on Node.js, MongoDB, and Google Maps JavaScript API that displays San Francisco film locations on a map, provided by [Data SF](https://data.sfgov.org/Culture-and-Recreation/Film-Locations-in-San-Francisco/yitu-d5am?). The map updates film location markers as the map moves (an option that can be disabled by a checkbox), and a search box presents auto-completed results based on movie title. Choosing a search result will limit film locations to just that movie, as well as display more detailed metadata about the movie in a pane below the map. Clicking on any location will also populate the show detail pane.
 
 A full hosted version can be found [here](http://sfmovies.nextguide.tv). This example is hosted on Linode.
 
@@ -35,7 +35,7 @@ The first challenge was to geocode locations from the SF Data feed, since locati
 
 I wrote a simple Node.js script (`script/geocode.js`) that iterates over the list of locations in the Data SF feed. To avoid Google rate limits, the script takes a while to execute since it waits for 2 seconds between geocoding requests. If a geocode result is found, the JSON is set as an additional member field for that movie location entry in Mongo. Not all locations get geocoded, however, and some additional effort could be spent parsing the location strings to get better geocoded results. Geocoded locations outside of SF city bounds are simply ignored (since obviously these are bad matches).
 
-I also wanted to display a movie image for each movie, so I wrote a similar script (`script/match_shows.js`) that invokes a search request based on the movie title against the NextGuide API (a web service that I wrote). Similarly to the geocoding process, if a match is found, the NextGuide metadata is also imported as JSON as an additional field per movie location. Again, this matching process could better be optimized, but I got about a 50% hit rate on finding a match (although there are false positives).
+I also wanted to display a movie image for each movie, so I wrote a similar script (`script/match_shows.js`) that invokes a search request based on the movie title against the NextGuide API (a web service that I wrote). Similarly to the geocoding process, if a match is found, the NextGuide metadata is also imported as JSON as an additional field per movie location. Again, this matching process could better be optimized, but I got about a 70% hit rate on finding a match (although there are false positives).
 
 The back-end mostly consists of a single JSON endpoint called `locations.json` that relatively mimics the Mongo syntax for querying collections. This is probably best illustrated by examples:
 * http://sfmovies.nextguide.tv/locations.json (All locations in Mongo - I don't recommend clicking on this link) 
@@ -55,7 +55,7 @@ The front-end mainly consists of 2 JavaScript files (in `public/javascripts/`) c
 
 `map_controller.js` contains all of the logic of initializing the map within SF city limits, and placing markers representing SF film locations. Originally when I implemented retrieving new film locations as the map moved, I would remove all previous markers and place all the new markers received in the latest response. Later I made the optimization of retaining existing markers in the new response, adding only the new ones in the latest response, and then removing all other markers. I limited markers to 100 from a client-side performance perspective, and found that > 100 could yield dense marker placement that was a bit unusable from a user experience perspective.
 
-Although Bootstrap is used for this web application, I didn't spend any time making the page responsive for different device sizes.
+Although Bootstrap is used for this web application, I didn't spend any time making the page responsive for different device sizes. However, it is 'usable' on a smartphone.
 
 ## Navigating the Code
 
