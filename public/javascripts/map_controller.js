@@ -133,37 +133,37 @@
         var toAdd = [];
         if(response && response.locations) {
             // Add all locations in response into hash with _id => location:
-            var newMarkers = {};
+            var responseLocations = {};
             for(var i=0; i < response.locations.length; i++) {
                 var location = response.locations[i];
-                newMarkers[location._id] = location;
+                responseLocations[location._id] = location;
             }
 
-            // Remove existing locations not in response locations
-            // (and put existing locations in currentMarkers hash keyed on _id):
-            var currentMarkers = {};
+            // Remove existing locations not in locations in response
+            // (and put existing locations in existing hash keyed on _id):
+            var existing = {};
             var deletedCount = 0;
             for(var i=_markers.length-1; i>=0; i--) {
                 if(!_markers[i]) continue;
                 var location = _markers[i].location;
-                if(location && !newMarkers[location._id]) {
+                if(location && !responseLocations[location._id]) {
                     _markers[i].setMap(null);
                     delete _markers[i];
                     deletedCount++;
                 } else {
-                    currentMarkers[location._id] = location;
+                    existing[location._id] = location;
                 }
             }
 
-            // For all new markers, find ones not already on map:
-            for(var key in newMarkers) {
-                var location = newMarkers[key];
-                if(location && !currentMarkers[location._id]) {
+            // For all locations in response, find ones not already on map:
+            for(var key in responseLocations) {
+                var location = responseLocations[key];
+                if(location && !existing[location._id]) {
                     toAdd.push(location);
                 }
             }
 
-            //console.log("Deleted %d | Added %d | Retained %d", deletedCount, toAdd.length, Object.keys(currentMarkers).length);
+            //console.log("Deleted %d | Added %d | Retained %d", deletedCount, toAdd.length, Object.keys(existing).length);
         }        
 
         _.each(toAdd, function(location) {
