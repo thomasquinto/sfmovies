@@ -71,6 +71,14 @@ Notable source code files (from within the `sfmovies` source code directory):
 * `public/javascripts/map_controller.js`: Front-end JavaScript controller for manipulating map and map markers.
 * `public/javascripts/search_controller.js`: Front-end JavaScript controller for handling autocomplete results.
 
+## Unit Tests
+
+I wrote some rudimentary unit tests that test the `locations.json` and `autocomplete.json` endpoints using the `nodeunit` package. If I had more time I would write more extensive unit tests but these will at least act as placeholders for the time being.  
+
+Tests can be executed as follows (within `sfmovies` source home directory):  
+`nodeunit test/test_locations.js`  
+`nodeunit test/test_autocomplete.js`  
+
 ## Installation (after cloning source from GitHub):
 
 Prerequisites:
