@@ -7,7 +7,7 @@
 ;(function($, _) {
 
     /**
-     * Default San Francisco Latitude/Longitude location:
+     * Default San Francisco Latitude/Longitude location (center):
      */
     var _sfLatitudeLongitude = [37.7833, -122.4167]; // SF: 37.7833° N, 122.4167° W
 
@@ -82,7 +82,7 @@
 
         // Don't update if map is moving because of infowindow being auto-panned:
         for(var i=0;i<_markers.length;i++) {
-            if(_markers[i].infoWindow && _markers[i].infoWindow.opened) {
+            if(_markers[i] && _markers[i].infoWindow && _markers[i].infoWindow.opened) {
                 return;
             }
         }
@@ -115,15 +115,58 @@
      * Handler when results return for 'locations.json' request to SF Movie Map backend.
      */
     function placeMarkersCallback(response) {
+
+        //console.log("response total locations: " + responase.locations.length);
        
-        // Clear out current markers:
-        // TODO: Retain duplicated markers in response, only add/subtract delta markers:
+        /*
+        // Clear all existing markers, and redraw all locations in response
+        // (which possibly removes and then re-adds existing locations)
         for (var i = 0; i < _markers.length; i++) {
             _markers[i].setMap(null);
         }
         _markers = [];
+        toAdd = response.locations;
+        */
 
-        _.each(response.locations, function(location) {
+        // Find new markers to add, remove current markers not in new response,
+        // and retain/leave alone existing (i.e. don't remove and redraw them)
+        var toAdd = [];
+        if(response && response.locations) {
+            // Add all locations in response into hash with _id => location:
+            var newMarkers = {};
+            for(var i=0; i < response.locations.length; i++) {
+                var location = response.locations[i];
+                newMarkers[location._id] = location;
+            }
+
+            // Remove existing locations not in response locations
+            // (and put existing locations in currentMarkers hash keyed on _id):
+            var currentMarkers = {};
+            var deletedCount = 0;
+            for(var i=_markers.length-1; i>=0; i--) {
+                if(!_markers[i]) continue;
+                var location = _markers[i].location;
+                if(location && !newMarkers[location._id]) {
+                    _markers[i].setMap(null);
+                    delete _markers[i];
+                    deletedCount++;
+                } else {
+                    currentMarkers[location._id] = location;
+                }
+            }
+
+            // For all new markers, find ones not already on map:
+            for(var key in newMarkers) {
+                var location = newMarkers[key];
+                if(location && !currentMarkers[location._id]) {
+                    toAdd.push(location);
+                }
+            }
+
+            //console.log("Deleted %d | Added %d | Retained %d", deletedCount, toAdd.length, Object.keys(currentMarkers).length);
+        }        
+
+        _.each(toAdd, function(location) {
             //console.log("location title: " + location.title);
             
             var latLng = new google.maps.LatLng(location.loc[0], location.loc[1]);
@@ -165,7 +208,7 @@
                     
                     google.maps.event.addListener(marker, 'mouseover', function() {
                         for(var i=0;i<_markers.length;i++) {
-                            if(_markers[i].infoWindow) {
+                            if(_markers[i] && _markers[i].infoWindow) {
                                 _markers[i].infoWindow.close();
                                 _markers[i].infoWindow.opened = false;
                             }
