@@ -55,7 +55,7 @@ The front-end mainly consists of 2 JavaScript files (in `public/javascripts/`) c
 
 `map_controller.js` contains all of the logic of initializing the map within SF city limits, and placing markers representing SF film locations. Originally when I implemented retrieving new film locations as the map moved, I would remove all previous markers and place all the new markers received in the latest response. Later I made the optimization of retaining existing markers in the new response, adding only the new ones in the latest response, and then removing all other markers. I limited markers to 100 from a client-side performance perspective, and found that > 100 could yield dense marker placement that was a bit unusable from a user experience perspective.
 
-Although Bootstrap is used for this web application, I didn't spend any time making the page responsive for different device sizes. However, it is 'usable' on a smartphone.
+Although Bootstrap is used for this web application, I didn't spend any time making the page responsive for different device sizes. However, the web app is 'usable' on a smartphone.
 
 ## Navigating the Code
 
@@ -75,7 +75,7 @@ Notable source code files (from within the `sfmovies` source code directory):
 
 I wrote some rudimentary unit tests that test the `locations.json` and `autocomplete.json` endpoints using the `nodeunit` package. If I had more time I would write more extensive unit tests but these will at least act as placeholders for the time being.  
 
-Tests can be executed as follows (within `sfmovies` source home directory):  
+Tests can be executed as follows (within `sfmovies` source home directory, and your node.js web server must be running):  
 `nodeunit test/test_locations.js`  
 `nodeunit test/test_autocomplete.js`  
 
