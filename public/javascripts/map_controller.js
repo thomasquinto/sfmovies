@@ -22,17 +22,19 @@
     var _map = null;
 
     /**
-     * Reference to currently displayed markers:
+     * Reference to currently displayed markers on map, stored in an array.
      */
     var _markers = [];
 
     /**
      * State map logic: only 2 states:
-     *    'update on bounds' => update markers based on moving Google Maps bounding box
-     *    'show selected' => user clicked on a Marker to see show details
+     *    _state_update_on_bounds => update markers based on moving Google Maps bounding box
+     *    _state_show_selected => user clicked on a Marker to see show details
      */
-    var _states = [ 'update_on_bounds', 'show_selected' ];
-    var _state = _states[0];
+    var _state_update_on_bounds = 1;
+    var _state_show_selected = 2;
+
+    var _state = _state_update_on_bounds;
 
     /**
      * Initializes Google Map and associated Markers.
@@ -55,9 +57,9 @@
         $('.redo :checkbox').click(function() {
             var $this = $(this);
             if ($this.is(':checked')) {
-                _state = 'update_on_bounds';
+                _state = _state_update_on_bounds;
             } else {                
-                _state = 'show_selected';
+                _state = _state_show_selected;
             }
         });
     }
@@ -69,7 +71,7 @@
         var data = { "title": title, "limit":"100" };
         
         $('.redo :checkbox').prop('checked', false);
-        _state = 'show_selected';
+        _state = _state_show_selected;
 
         placeMarkers(data);
     }
@@ -78,7 +80,7 @@
      * Places markers that fall within the Bounding Box of the currently displayed map.
      */
     function placeMarkersForBounds() {
-        if(_state != 'update_on_bounds') return;
+        if(_state != _state_update_on_bounds) return;
 
         // Don't update if map is moving because of infowindow being auto-panned:
         for(var i=0;i<_markers.length;i++) {
@@ -228,10 +230,15 @@
         });   
 
         // If 'show selected' state, pop-up InfoWindow for first Marker:
-        if(_state == 'show_selected' && _markers.length) {
-            var marker = _markers[0];            
-            marker.infoWindow.open(_map, marker);
-            markerClicked(marker.location);
+        if(_state == _state_show_selected && _markers.length) {
+            for(var i=0; i<_markers.length; i++) {
+                var marker = _markers[i];            
+                if(marker) {
+                    marker.infoWindow.open(_map, marker);
+                    markerClicked(marker.location);
+                    break;
+                }
+            }
         }
      
     }
