@@ -46,7 +46,7 @@ The back-end mostly consists of a single JSON endpoint called `locations.json` t
 
 The front-end map uses the bounding box of the map viewport to update locations as the viewport changes, using the bounding box version of the `locations.json` request.
 
-For the search feature, I used a pre-built Node.js package aptly called 'autocomplete', which uses a trie-based structure to store phrases for optimized querying as keystrokes are entered by the user. This invokes the `autocomplete.json` endpoint on the back-end, which upon first request builds the trie via a MongoDB query. Once the trie is initialized, it spits back Movie Title results (initialization takes less than second). The returned Movie Title can then be used to retrieve the full `movie_location` entity for Mongo (via `locations.json`, which is then displayed in the Show Detail pane below the map.
+For the search feature, I used a pre-built Node.js package aptly called 'autocomplete', which uses a trie-based structure to store phrases for optimized querying as keystrokes are entered by the user. This invokes the `autocomplete.json` endpoint on the back-end, which upon first request builds the trie via a MongoDB query. Once the trie is initialized, it spits back Movie Title results (initialization takes less than second). The returned Movie Title can then be used to retrieve the full `movie_location` entity in the Mongo collection (via `locations.json`), which is then displayed in the Show Detail pane below the map.
 
 Example `autocomplete.json` request:
 * http://sfmovies.nextguide.tv/autocomplete.json?phrase=s (Return all movie titles beginning with 's')

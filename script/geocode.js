@@ -3,7 +3,7 @@
 /**
  * Usage (invoked from application home directory):
  *
- * # script/geocode.js
+ * $ script/geocode.js
  *
  * Iterates over all entries in the 'movie_locations' MongoDB collection and invokes a Google Maps
  * geocode request. If matched, sets the returned JSON blob as the field 'geocodes', which is an

@@ -65,7 +65,7 @@
     }
 
     /**
-     * Places markers for locations for a single Movie Title.
+     * Places markers for locations for a single Movie Title (chosen in Search Field).
      */
     function placeMarkersForTitle(title) {
         var data = { "title": title, "exists": "loc", "limit":"100" };

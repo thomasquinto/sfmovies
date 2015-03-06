@@ -3,7 +3,7 @@
 /**
  * Usage (invoked from application home directory):
  *
- * # script/match_shows.js
+ * $ script/match_shows.js
  *
  * Iterates over all entries in the 'movie_locations' MongoDB collection and invokes a NextGuide
  * request to match on the Movie Title field. If a match is found, the 'show_data' field is populated
