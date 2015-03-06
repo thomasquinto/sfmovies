@@ -55,7 +55,7 @@ function init(db, res, phrase) {
 
                                      // 'scrub' the title for easier, generalized matching:
                                      var lower = title.replace('"', '');
-                                     lower = lower.toLowerCase();
+                                     lower = lower.toLowerCase().trim();
 
                                      scrubbedToOriginal[lower] = title;
                                      titles.push(lower);
