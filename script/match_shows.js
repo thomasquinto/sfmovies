@@ -1,5 +1,15 @@
 #!/usr/bin/env node
 
+/**
+ * Usage (invoked from application home directory):
+ *
+ * # script/match_shows.js
+ *
+ * Iterates over all entries in the 'movie_locations' MongoDB collection and invokes a NextGuide
+ * request to match on the Movie Title field. If a match is found, the 'show_data' field is populated
+ * for the entry, including additional movie metadata like Box Art image.
+ */
+
 // Http Client for external web services API requests:
 var http = require('http')
 
@@ -18,7 +28,7 @@ function matchShows() {
         var start = 0;
         var limit = docs.length;
         var i = start;
-        var timeoutInterval = 10;
+        var timeoutInterval = 10; // No real rate limit with NextGuide API.
 
         function setShowData(movie) {
             

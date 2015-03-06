@@ -1,3 +1,14 @@
+/**
+ * Entry point to start SF Movie Map web application.
+ *
+ * Possible Usages (node, nodemon, forever):
+ *
+ * node app.js
+ *
+ * nodemon app.js
+ *
+ * sudo forever start app.js
+ */
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');

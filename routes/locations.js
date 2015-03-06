@@ -1,10 +1,15 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET geocode.
- * Iterates over each movie location and performs a Google Maps Geocode API method for each.
+/**
+ * GET locations (returns HTML)
+ *
+ * Returns a list of locations based on query parameters.
+ * @param {string} req.query.exists is not null' equivalent
+ * @param {string} req.query.title 'where title = ?' equivalent
+ * @param {int} req.query.offset Offset
+ * @param {int} req.query.limit Limit
  */
-
 router.get('/locations', function(req, res) {
     var db = req.db;
     var collection = db.get('movie_locations');
@@ -19,6 +24,15 @@ router.get('/locations', function(req, res) {
                      });
 });
 
+/**
+ * GET locations.json (returns JSON)
+ *
+ * Returns a list of locations based on query parameters.
+ * @param {string} req.query.exists is not null' equivalent
+ * @param {string} req.query.title 'where title = ?' equivalent
+ * @param {int} req.query.offset Offset
+ * @param {int} req.query.limit Limit
+ */
 router.get('/locations.json', function(req, res) {
     var db = req.db;
     var collection = db.get('movie_locations');
@@ -30,6 +44,15 @@ router.get('/locations.json', function(req, res) {
                      });    
 });
 
+/**
+ * Returns a criteria hash for:
+ *     $exists (field exists, or is not null, for entry)
+ *     $title (where title = ?)
+ *     $bounds (bounding box defined by 2 latituide/longitude tuples)
+ *
+ * @param { request } Request object
+ * @return { hash of criteria options } criteria hash
+ */
 function getCriteria(req) {
     var criteria = {};
 
@@ -61,6 +84,14 @@ function getCriteria(req) {
     return criteria;
 }
 
+/**
+ * Returns an optinos hash for:
+ *     $limit (limited number of results)
+ *     $offset (offset to begin returned list)
+ *
+ * @param { request } Request object
+ * @return { hash of criteria options } criteria hash
+ */
 function getOptions(req) {
     var options = {};
 

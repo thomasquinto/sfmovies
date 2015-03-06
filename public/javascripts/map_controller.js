@@ -1,4 +1,4 @@
-/*
+/**
  * map_controller.js
  *
  * Handles all map handling for SF Movie Map application.
@@ -6,26 +6,37 @@
  */ 
 ;(function($, _) {
 
-    /*
+    /**
      * Default San Francisco Latitude/Longitude location:
      */
     var _sfLatitudeLongitude = [37.7833, -122.4167]; // SF: 37.7833° N, 122.4167° W
 
-    /*
+    /**
      * Default "Zoom" parameter:
      */
     var _defaultZoom = 13;
 
-    /*
+    /**
      * Reference to map instance:
      */ 
     var _map = null;
 
+    /**
+     * Reference to currently displayed markers:
+     */
     var _markers = [];
 
+    /**
+     * State map logic: only 2 states:
+     *    'update on bounds' => update markers based on moving Google Maps bounding box
+     *    'show selected' => user clicked on a Marker to see show details
+     */
     var _states = [ 'update_on_bounds', 'show_selected' ];
     var _state = _states[0];
 
+    /**
+     * Initializes Google Map and associated Markers.
+     */
     function init() {
         var mapOptions = {
             zoom: _defaultZoom,
@@ -51,6 +62,9 @@
         });
     }
 
+    /**
+     * Places markers for locations for a single Movie Title.
+     */
     function placeMarkersForTitle(title) {
         var data = { "title": title, "limit":"100" };
         
@@ -60,6 +74,9 @@
         placeMarkers(data);
     }
 
+    /**
+     * Places markers that fall within the Bounding Box of the currently displayed map.
+     */
     function placeMarkersForBounds() {
         if(_state != 'update_on_bounds') return;
 
@@ -77,6 +94,9 @@
         placeMarkers(data);
     }
 
+    /**
+     * Places markers based on 'data' hash options.
+     */
     function placeMarkers(data) {
         if(_map && _map.getBounds()) {
             data.bounds = _map.getBounds().toString();
@@ -91,8 +111,13 @@
         );
     }
 
+    /**
+     * Handler when results return for 'locations.json' request to SF Movie Map backend.
+     */
     function placeMarkersCallback(response) {
        
+        // Clear out current markers:
+        // TODO: Retain duplicated markers in response, only add/subtract delta markers:
         for (var i = 0; i < _markers.length; i++) {
             _markers[i].setMap(null);
         }
@@ -111,9 +136,11 @@
             var marker = new google.maps.Marker(markerOptions);
             marker.location = location;
             
+            // Put marker on the map
             marker.setMap(_map);
             _markers.push(marker);
             
+            // Initialize click function so InfoWindow shows movie art and metadata in pop-up
             google.maps.event.addListener(marker, 'click', function() {
                 markerClicked(location);
             });
@@ -157,6 +184,7 @@
 
         });   
 
+        // If 'show selected' state, pop-up InfoWindow for first Marker:
         if(_state == 'show_selected' && _markers.length) {
             var marker = _markers[0];            
             marker.infoWindow.open(_map, marker);
@@ -165,6 +193,9 @@
      
     }
 
+    /**
+     * Displays Movie metadata in bottom panel for latest selected movie.
+     */
     function markerClicked(location) {
         console.log("location clicked: " + location.title);
        
@@ -182,7 +213,7 @@
     }
 
     /*
-     * "Module" declaration (declares public functions offered by this module):
+     * "Module" declaration (declares public functions exposed by this module):
      */
     this.MapController = function() {
         return {

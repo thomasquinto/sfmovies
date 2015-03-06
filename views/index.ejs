@@ -51,7 +51,9 @@
           "&signed_in=true&callback=initialize&&key=AIzaSyDATd6iwCHxJUErroouJEelUB5VJ1LYjdE";
         document.body.appendChild(script);
       }
-      
+
+      // Callback invoked after Google Maps has been officially loaded
+      // (i.e. let's get on with our application):
       function initialize() {
         MapController().init();      
         SearchController().init();

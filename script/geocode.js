@@ -1,14 +1,33 @@
 #!/usr/bin/env node
 
+/**
+ * Usage (invoked from application home directory):
+ *
+ * # script/geocode.js
+ *
+ * Iterates over all entries in the 'movie_locations' MongoDB collection and invokes a Google Maps
+ * geocode request. If matched, sets the returned JSON blob as the field 'geocodes', which is an
+ * array of possible geocode matches.
+ *
+ * If geocode match is within San Francisco bounds, the 'loc' field is set for that entry in the
+ * collection, and will eventually appear in the SF Movie Map page.
+ *
+ * NOTE: Please use your own gmApiKey for Google Maps API access below!
+ */
+
 // Node Google Maps:
-var gmApiKey = 'AIzaSyDATd6iwCHxJUErroouJEelUB5VJ1LYjdE';
+var gmApiKey = 'AIzaSyDATd6iwCHxJUErroouJEelUB5VJ1LYjdE'; // CHANGE TO YOUR OWN KEY!
 var gm = require('googlemaps');
+var gmRateLimitInterval = 1000; // milliseconds to wait inbetween request to avoid Google rate limits
 gm.config( { 'key': gmApiKey } )
 
 // MongoDB:
 var mongo = require('mongodb');
 var monk = require('monk');
 var db = monk('localhost:27017/sfmovies');
+
+// San Francisco Bounding Box (includes some 'Bay Area' surroundins):
+var sfBoundingBox = [ [37.59975669590035, -122.80242311401366], [37.941701510621506, -122.01964723510741] ];
 
 /** 
  * Iterates over each movie location and performs a Google Maps Geocode API request to populate geocode results.
@@ -23,7 +42,7 @@ function geocodeLocations() {
         var start = 0;
         var limit = docs.length;
         var i = start;
-        var timeoutInterval = 1000;
+        var timeoutInterval = gmRateLimitInterval;
 
         function setLocation(location) {
 
@@ -66,8 +85,12 @@ function geocodeLocations() {
     });
 }
 
-var sfBoundingBox = [ [37.59975669590035, -122.80242311401366], [37.941701510621506, -122.01964723510741] ];
-
+/**
+ * Checks if 'loc' parameter is within San Francisco latitude/longitude-defined bounding box.
+ *
+ * @param { [latitude, longitude] } loc Location latitude/longitude tuple
+ * @return {boolean} true if within SF bounding box constant
+ */
 function isLocationWithinSF(loc) {
     console.log('loc: %s', JSON.stringify(loc));
 

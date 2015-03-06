@@ -2,6 +2,7 @@
  * search_controller.js
  *
  * Handles auto-complete search based on movie title.
+ * Uses jQuery autocomplete widget.
  */ 
 ;(function($, _) {
 
@@ -16,6 +17,9 @@
         });
     }
 
+    /**
+     * Invoke SF Movie Map back-end to get autocompleted results.
+     */
     function doSearch(req, res) {        
         $.ajax(
             {
@@ -37,7 +41,7 @@
     }
 
     /*
-     * "Module" declaration (declares public functions offered by this module):
+     * "Module" declaration (declares public functions exposed by this module):
      */
     this.SearchController = function() {
         return {

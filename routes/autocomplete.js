@@ -5,8 +5,9 @@ var auto;
 var scrubbedToOriginal = {};
 
 /**
- * GET automplete
- * Returns autocomplete results for movie title.
+ * GET automplete.
+ * Returns auto-complete results for a movie title based on a submitted phrase.
+ * On first request, builds a word 'trie' index for optimized querying.
  */
 router.get('/autocomplete.json', function(req, res) {
 
@@ -21,6 +22,11 @@ router.get('/autocomplete.json', function(req, res) {
     }
 });
 
+/**
+ * Returns original Movie Title string associated with search phrase.
+ *
+ * @param {string} phrase Search phrase mapped to Movie Title
+ */
 function getResults(phrase) {
     var results = auto.search(phrase);
     for(var i=0; i<results.length; i++) {
@@ -29,6 +35,12 @@ function getResults(phrase) {
     return results;
 }
 
+/**
+ * Initialization function that performs a 'group by' equivalent query on Movie Title field
+ * (with existing geocoded locations) to build a word trie.
+ *
+ * @param {string} phrase Initial search phrase query
+ */
 function init(db, res, phrase) {
     var collection = db.get('movie_locations');
 
@@ -41,6 +53,7 @@ function init(db, res, phrase) {
 
                                      var title = docs[i]._id;
 
+                                     // 'scrub' the title for easier, generalized matching:
                                      var lower = title.replace('"', '');
                                      lower = lower.toLowerCase();
 
@@ -63,6 +76,7 @@ function init(db, res, phrase) {
                                      onReady(titles);
                                      console.log('Trie initialized!');
 
+                                     // With a freshly initialized trie, not satisfy the original request:
                                      if(phrase) {
                                          res.send({ 'autocomplete' : getResults(phrase) });
                                      }
