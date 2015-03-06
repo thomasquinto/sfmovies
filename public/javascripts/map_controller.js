@@ -230,11 +230,11 @@
     }
 
     /**
-     * Builds html for InfoWindow pop-up for a given location.
+     * Returns thumbnail Box Art image for movie (if one exists):
      */
-    function getInfoWindowHtml(location) {
-                        
+    function getThumbnailImage(location) {                        
         var thumbnailImage = null;
+
         if(location.show_data && location.show_data.images) {            
             var sortedImages = _.sortBy(location.show_data.images, function(image) { return image.width; });
             
@@ -244,6 +244,16 @@
                 }
             });
         }
+        
+        return thumbnailImage;
+    }
+
+    /**
+     * Builds html for InfoWindow pop-up for a given location.
+     */
+    function getInfoWindowHtml(location) {
+
+        var thumbnailImage = getThumbnailImage(location);
 
         var html = _.template(
             '<div class="infowindow_div">' + 
@@ -263,15 +273,48 @@
      * Displays Movie metadata in bottom panel for latest selected movie.
      */
     function markerClicked(location) {
-        console.log("location clicked: " + location.title);
+        //console.log("location clicked: " + location.title);
        
+        var thumbnailImage = getThumbnailImage(location);
+
         var html = _.template(
             '<div class="panel panel-default">' + 
-                '<div class="panel-heading"><%= location.title %></div>' + 
+                '<div class="panel-heading"><h4><%= location.title %> (<%= location.release_year %>)</h4></div>' + 
                 '<div class="panel-body">' + 
-                '<p><%= location.locations %></p>' +
+
+                '<% if (thumbnailImage) { %>' +
+                '<img class="panel_img" src="<%= thumbnailImage.url%>" />' +
+                '<% } %>' +
+
+                '<% if (location.director) { %>' +
+                '<p>Director: <%= location.director %>' +
+                '</p>' +
+                '<% } %>' +
+
+                '<% if (location.actor_1) { %>' +
+                '<p>Cast: <%= location.actor_1 %>' +
+                  '<% if (location.actor_2) { %>' +
+                  ', <%= location.actor_2 %>' +
+                  '<% } %>' +
+                  '<% if (location.actor_3) { %>' +
+                  ', <%= location.actor_3 %>' +
+                  '<% } %>' +
+                '</p>' +
+                '<% } %>' +
+
+                '<p>Filmed at <%= location.locations %></p>' +
+
+                '<% if (location.fun_facts) { %>' +
+                '<p>Fun Fact: <%= location.fun_facts %></p>' +
+                '<% } %>' +
+
+                '<% if (location.show_data) { %>' +
+                '<p>See more on <a href="javascript:void()" onclick="window.open(\'http://nextguide.tv/<%= location.show_data.dijit_id %>\')">NextGuide.tv</a></p>' +
+                '<% } %>' +
+
+                '</div>' +
              '</div>'
-        )( { location: location } );
+        )( { location: location, thumbnailImage: thumbnailImage } );
 
         $('#show').empty();
         $('#show').append(html);
