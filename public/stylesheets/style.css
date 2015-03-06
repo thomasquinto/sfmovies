@@ -21,6 +21,10 @@ a {
     margin-bottom: 15px;
 }
 
+.infowindow_div {
+    max-width: 80px;
+}
+
 .infowindow_img {
     max-height: 100px;
 }

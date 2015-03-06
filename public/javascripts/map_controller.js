@@ -92,7 +92,7 @@
 
         $('#search').val('');
         
-        var data = { "exists": "loc,show_data", "limit":"100" };
+        var data = { "exists": "loc", "limit":"100" };
         placeMarkers(data);
     }
 
@@ -120,16 +120,6 @@
 
         //console.log("response total locations: " + responase.locations.length);
        
-        /*
-        // Clear all existing markers, and redraw all locations in response
-        // (which possibly removes and then re-adds existing locations)
-        for (var i = 0; i < _markers.length; i++) {
-            _markers[i].setMap(null);
-        }
-        _markers = [];
-        toAdd = response.locations;
-        */
-
         // Find new markers to add, remove current markers not in new response,
         // and retain/leave alone existing (i.e. don't remove and redraw them)
         var toAdd = [];
@@ -137,8 +127,7 @@
             // Add all locations in response into hash with _id => location:
             var responseLocations = {};
             for(var i=0; i < response.locations.length; i++) {
-                var location = response.locations[i];
-                responseLocations[location._id] = location;
+                responseLocations[response.locations[i]._id] = response.locations[i];
             }
 
             // Remove existing locations not in locations in response
@@ -149,6 +138,7 @@
                 if(!_markers[i]) continue;
                 var location = _markers[i].location;
                 if(location && !responseLocations[location._id]) {
+                    // Old marker not in new response; delete:
                     _markers[i].setMap(null);
                     delete _markers[i];
                     deletedCount++;
@@ -168,65 +158,9 @@
             //console.log("Deleted %d | Added %d | Retained %d", deletedCount, toAdd.length, Object.keys(existing).length);
         }        
 
+        // Add a Marker for each new location:
         _.each(toAdd, function(location) {
-            //console.log("location title: " + location.title);
-            
-            var latLng = new google.maps.LatLng(location.loc[0], location.loc[1]);
-            var markerOptions = {
-                position: latLng,
-                title: location.title + " (" + location.locations + ")",
-                map: _map
-            };
-            
-            var marker = new google.maps.Marker(markerOptions);
-            marker.location = location;
-            
-            // Put marker on the map
-            marker.setMap(_map);
-            _markers.push(marker);
-            
-            // Initialize click function so InfoWindow shows movie art and metadata in pop-up
-            google.maps.event.addListener(marker, 'click', function() {
-                markerClicked(location);
-            });
-            
-            if(location.show_data && location.show_data.images) {
-                
-                var sortedImages = _.sortBy(location.show_data.images, function(image) { return image.width; });
-                
-                var thumbnailImage = _.find(sortedImages, function(image) {
-                    if(image.category.indexOf('Box Art') > -1) {
-                        return image;
-                    }
-                });
-                
-                if(thumbnailImage) {
-                                        
-                    var infoWindow = new google.maps.InfoWindow({
-                        content: "<img class='infowindow_img' src='" + thumbnailImage.url + "' />"
-                    });
-
-                    marker.infoWindow = infoWindow;
-                    
-                    google.maps.event.addListener(marker, 'mouseover', function() {
-                        for(var i=0;i<_markers.length;i++) {
-                            if(_markers[i] && _markers[i].infoWindow) {
-                                _markers[i].infoWindow.close();
-                                _markers[i].infoWindow.opened = false;
-                            }
-                        }
-
-                        infoWindow.open(_map, marker);
-                        infoWindow.opened = true;
-                    });
-
-                    google.maps.event.addListener(marker, 'mouseout', function() {
-                        infoWindow.close();
-                        infoWindow.opened = false;
-                    });                    
-                }
-            }            
-
+            addMarkerForLocation(location);
         });   
 
         // If 'show selected' state, pop-up InfoWindow for first Marker:
@@ -239,8 +173,90 @@
                     break;
                 }
             }
+        }     
+    }
+
+    /**
+     * Creates a GoogleMaps Marker object based on a single movie location and adds
+     * it to the markers array.
+     */
+    function addMarkerForLocation(location) {
+        //console.log("location title: " + location.title);
+        
+        var latLng = new google.maps.LatLng(location.loc[0], location.loc[1]);
+        var markerOptions = {
+            position: latLng,
+            title: location.title + " (" + location.locations + ")",
+            map: _map
+        };
+        
+        var marker = new google.maps.Marker(markerOptions);
+        marker.location = location;
+        
+        // Put marker on the map
+        marker.setMap(_map);
+        _markers.push(marker);
+        
+        // Initialize click function so InfoWindow shows movie art and metadata in pop-up
+        google.maps.event.addListener(marker, 'click', function() {
+            markerClicked(location);
+        });
+        
+        var infoWindow = new google.maps.InfoWindow({ 
+            content: getInfoWindowHtml(location) 
+        });
+        marker.infoWindow = infoWindow;
+            
+        // Add mouseover event so that InfoWindow pops up on hover:
+        google.maps.event.addListener(marker, 'mouseover', function() {
+
+            // Close any other currently open InfoWindow:
+            for(var i=0;i<_markers.length;i++) {
+                if(_markers[i] && _markers[i].infoWindow) {
+                    _markers[i].infoWindow.close();
+                    _markers[i].infoWindow.opened = false;
+                }
+            }
+            
+            infoWindow.open(_map, marker);
+            infoWindow.opened = true;
+        });
+        
+        // Close InfoWindow on mouseout:
+        google.maps.event.addListener(marker, 'mouseout', function() {
+            infoWindow.close();
+            infoWindow.opened = false;
+        });                    
+    }
+
+    /**
+     * Builds html for InfoWindow pop-up for a given location.
+     */
+    function getInfoWindowHtml(location) {
+                        
+        var thumbnailImage = null;
+        if(location.show_data && location.show_data.images) {            
+            var sortedImages = _.sortBy(location.show_data.images, function(image) { return image.width; });
+            
+            var thumbnailImage = _.find(sortedImages, function(image) {
+                if(image.category.indexOf('Box Art') > -1) {
+                    return image;
+                }
+            });
         }
-     
+
+        var html = _.template(
+            '<div class="infowindow_div">' + 
+                '<% if (thumbnailImage) { %>' +
+                '<img class="infowindow_img" src="<%= thumbnailImage.url%>" />' + 
+                '<% } else {  %>' +
+                '<div><%= location.title %> (<%= location.release_year %>)</div>' +
+                //'<div><%= location.locations %></div>' +
+                '<% } %>' +
+             '</div>'
+        )( { location: location, thumbnailImage: thumbnailImage } );
+
+        return html;
     }
 
     /**
