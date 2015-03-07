@@ -105,6 +105,10 @@
      * Places markers based on 'data' hash options.
      */
     function placeMarkers(data) {
+        
+        // We only care about 'loc' parameter, so 'geocodes' blob can be omitted from results for faster loading:
+        data.exc = 'geocodes';
+
         $.ajax(
             {
                 url: "locations.json",

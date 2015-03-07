@@ -42,6 +42,7 @@ The back-end mostly consists of a single JSON endpoint called `locations.json` t
 * http://sfmovies.nextguide.tv/locations.json?offset=5&limit=10 (10 locations from offset of 5) 
 * http://sfmovies.nextguide.tv/locations.json?exists=show_data&limit=10 (First 10 locations with existing, non-null 'show_data' field) 
 * http://sfmovies.nextguide.tv/locations.json?title=Edtv (All locations for the movie with title 'Edtv') 
+* http://sfmovies.nextguide.tv/locations.json?title=Edtv&exc=geocodes (Same as previous request, but omit 'geocodes' field from response)
 * http://sfmovies.nextguide.tv/locations.json?limit=10&bounds=((37.78514415367402%2C+-122.43592607421874)%2C+(37.80752571486966%2C+-122.35524522705077)) (First 10 locations within a bounding box defined by 2 latitude/longitude points) 
 
 The front-end map uses the bounding box of the map viewport to update locations as the viewport changes, using the bounding box version of the `locations.json` request.

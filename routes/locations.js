@@ -5,44 +5,63 @@ var router = express.Router();
  * GET locations (returns HTML)
  *
  * Returns a list of locations based on query parameters.
- * @param {string} req.query.exists 'is not null' equivalent
+ * @param {string} req.query.exists 'is not null' equivalent (accepts comma-delimited list)
  * @param {string} req.query.title 'where title = ?' equivalent
+ * @param {string} req.query.bounds bounding box param in format: "((lat1, lon1), (lat2, lon2))"
+ * @param {string} req.query.exc exclude field in response (accepts comma-delimited list)
  * @param {int} req.query.offset Offset
  * @param {int} req.query.limit Limit
  */
 router.get('/locations', function(req, res) {
-    var db = req.db;
-    var collection = db.get('movie_locations');
-
-    collection.find( getCriteria(req),
-                     getOptions(req),
-                     function(e, docs) {     
-                         res.render('locations', {
-                             'title' : 'SF Movie Map',
-                             'locations' : docs,
-                         });
-                     });
+    var fun = function(e, docs) {     
+        res.render('locations', {
+            'title' : 'SF Movie Map',
+            'locations' : docs,
+        });
+    };
+    
+    getLocations(req, res, fun);
 });
 
 /**
  * GET locations.json (returns JSON)
  *
  * Returns a list of locations based on query parameters.
- * @param {string} req.query.exists 'is not null' equivalent
+ * @param {string} req.query.exists 'is not null' equivalent (accepts comma-delimited list)
  * @param {string} req.query.title 'where title = ?' equivalent
+ * @param {string} req.query.bounds bounding box param in format: "((lat1, lon1), (lat2, lon2))"
+ * @param {string} req.query.exc exclude field in response (accepts comma-delimited list)
  * @param {int} req.query.offset Offset
  * @param {int} req.query.limit Limit
  */
 router.get('/locations.json', function(req, res) {
+    var fun = function(e, docs) { 
+        res.send({ 'locations' : docs });
+    };
+
+    getLocations(req, res, fun);
+});
+
+/**
+ * Performs mongo query on movie_locations table by interpreting request parameters.
+ * (Not using Monk, but instead underlying MongoDB driver in order to use combination
+ * of limit AND excluded return fields).
+ */
+function getLocations(req, res, fun) {
+
     var db = req.db;
     var collection = db.get('movie_locations');
+    var results = collection.col.find(getCriteria(req), getOptions(req));
 
-    collection.find( getCriteria(req),
-                     getOptions(req),
-                     function(e, docs) {                             
-                         res.send({ 'locations' : docs });
-                     });    
-});
+    var limit = req.query.limit ? parseInt(req.query.limit) : null;
+    var skip = req.query.offset ? parseInt(req.query.offset) : 0;
+
+    if(limit) {
+        results.limit(limit).skip(skip).toArray(fun);
+    } else {
+        results.skip(skip).toArray(fun);
+    }    
+}
 
 /**
  * Returns a criteria hash for:
@@ -93,14 +112,14 @@ function getCriteria(req) {
  * @return { hash of criteria options } criteria hash
  */
 function getOptions(req) {
+
     var options = {};
 
-    if(req.query.limit) {
-        options['limit'] = req.query.limit;
-    }
-
-    if(req.query.offset) {
-        options['skip'] = req.query.offset;
+    if(req.query.exc) {
+        var split = req.query.exc.split(",")
+        for(var i=0; i<split.length; i++) {
+            options[split[i]] = 0;
+        }
     }
 
     console.log('options: ' + JSON.stringify(options));
