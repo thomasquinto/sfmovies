@@ -5,7 +5,7 @@ var router = express.Router();
  * GET locations (returns HTML)
  *
  * Returns a list of locations based on query parameters.
- * @param {string} req.query.exists is not null' equivalent
+ * @param {string} req.query.exists 'is not null' equivalent
  * @param {string} req.query.title 'where title = ?' equivalent
  * @param {int} req.query.offset Offset
  * @param {int} req.query.limit Limit
@@ -28,7 +28,7 @@ router.get('/locations', function(req, res) {
  * GET locations.json (returns JSON)
  *
  * Returns a list of locations based on query parameters.
- * @param {string} req.query.exists is not null' equivalent
+ * @param {string} req.query.exists 'is not null' equivalent
  * @param {string} req.query.title 'where title = ?' equivalent
  * @param {int} req.query.offset Offset
  * @param {int} req.query.limit Limit
@@ -85,7 +85,7 @@ function getCriteria(req) {
 }
 
 /**
- * Returns an optinos hash for:
+ * Returns an options hash for:
  *     $limit (limited number of results)
  *     $offset (offset to begin returned list)
  *

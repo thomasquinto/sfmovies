@@ -76,7 +76,7 @@ function init(db, res, phrase) {
                                      onReady(titles);
                                      console.log('Trie initialized!');
 
-                                     // With a freshly initialized trie, not satisfy the original request:
+                                     // With a freshly initialized trie, now satisfy the original request:
                                      if(phrase) {
                                          res.send({ 'autocomplete' : getResults(phrase) });
                                      }

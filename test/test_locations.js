@@ -32,7 +32,7 @@ exports.testLocations1 = function(test){
             var parsed = JSON.parse(body);
 
             test.ok(parsed.locations, 'valid locations response');
-            test.ok(parsed.locations.length == 1, 'limit validation');
+            test.ok(parsed.locations.length == 1, 'valid limit');
             test.ok(parsed.locations[0].loc, 'location exists');
             test.done();
         
@@ -65,7 +65,7 @@ exports.testLocations2 = function(test){
             var parsed = JSON.parse(body);
 
             test.ok(parsed.locations, 'valid locations response');
-            test.ok(parsed.locations.length > 1, 'limit validation');
+            test.ok(parsed.locations.length > 1, 'valid length');
             test.ok(parsed.locations[0].title == 'Edtv', 'valid title');
             test.done();
         
