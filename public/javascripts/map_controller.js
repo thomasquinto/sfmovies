@@ -256,15 +256,7 @@
             
         // Add mouseover event so that InfoWindow pops up on hover:
         google.maps.event.addListener(marker, 'mouseover', function() {
-
-            // Close any other currently open InfoWindow:
-            for(var i=0;i<_markers.length;i++) {
-                if(_markers[i] && _markers[i].infoWindow) {
-                    _markers[i].infoWindow.close();
-                    _markers[i].infoWindow.opened = false;
-                }
-            }
-            
+            dismissCurrentInfoWindow();
             infoWindow.open(_map, marker);
             infoWindow.opened = true;
         });
@@ -275,6 +267,19 @@
             infoWindow.opened = false;
         });                    
     }
+
+    /**
+     * Close any other currently open InfoWindow:
+     */
+    function dismissCurrentInfoWindow() {
+        for(var i=0;i<_markers.length;i++) {
+            if(_markers[i] && _markers[i].infoWindow) {
+                _markers[i].infoWindow.close();
+                _markers[i].infoWindow.opened = false;
+            }
+        }
+    }
+
 
     /**
      * Returns thumbnail Box Art image for movie (if one exists):
@@ -369,6 +374,7 @@
 
         // Activate 'See all locations' link:
         $('#all_locations').click(function() {
+            dismissCurrentInfoWindow();            
             placeMarkersForTitle(location.title);
         });
     }
