@@ -58,6 +58,7 @@
             var $this = $(this);
             if ($this.is(':checked')) {
                 _state = _state_update_on_bounds;
+                placeMarkersForBounds();
             } else {                
                 _state = _state_show_selected;
             }
@@ -348,7 +349,7 @@
                 '</p>' +
                 '<% } %>' +
 
-                '<p>Filmed at <%= location.locations %></p>' +
+                '<p>Filmed at <%= location.locations %> (<a id="all_locations" href="javascript:void()">See all locations</a>)</p>' +
 
                 '<% if (location.fun_facts) { %>' +
                 '<p>Fun Fact: <%= location.fun_facts %></p>' +
@@ -365,6 +366,11 @@
         $('#show').empty();
         $('#show').append(html);
         $('#show').css('display', 'block');
+
+        // Activate 'See all locations' link:
+        $('#all_locations').click(function() {
+            placeMarkersForTitle(location.title);
+        });
     }
 
     /*

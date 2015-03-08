@@ -38,6 +38,7 @@
     function doSelect(event, ui) {
         //console.log("value: " + ui.item.value);
         MapController().placeMarkersForTitle(ui.item.value);
+        $( '#search' ).blur(); // dismisses keyboard on mobile
     }
 
     /*
