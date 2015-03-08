@@ -9,7 +9,7 @@
     /**
      * Default San Francisco Latitude/Longitude location (center):
      */
-    var _sfLatitudeLongitude = [37.7833, -122.4167]; // SF: 37.7833° N, 122.4167° W
+    var _sfLatitudeLongitude = [37.78819551746348, -122.44551830688476];
 
     /**
      * Default "Zoom" parameter:
@@ -48,7 +48,7 @@
         _map = new google.maps.Map($("#map")[0], mapOptions);
 
         google.maps.event.addListener(_map, "idle", function() {
-            //console.log("map bounds: " + _map.getBounds());
+            //console.log("map bounds: " + _map.getBounds() + ", center: " + _map.getCenter());
             placeMarkersForBounds();
         });
 
